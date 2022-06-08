@@ -37,7 +37,7 @@ io.on('connection', (socket) => {
     (async () => {
       try{
         const result = await conn.query("SELECT * FROM users");
-        io.emit('listAllUsers',result);
+        socket.emit('listAllUsers',result);
       } catch(err){
         throw err;
       }
