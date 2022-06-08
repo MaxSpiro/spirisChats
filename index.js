@@ -30,6 +30,10 @@ const conn = makeDb({
 });
 
 
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/page.html');
+});
+app.use(express.static('.'));
 
 io.on('connection', (socket) => {
 
@@ -47,8 +51,32 @@ io.on('connection', (socket) => {
   socket.on('createUser',function(data){
     (async () => {
       try{
-        const result = await conn.query("INSERT INTO `users`(`username`, `password`, `email`) VALUES (?,?,?)",[data["username"],data["password"],data["email"]]);
-        socket.emit('createUser',"Thank you for signing up, "+data["username"]+".");
+        const usersWithSameName = await conn.query("SELECT * FROM users WHERE username = ?",[data["username"]]);
+        if(usersWithSameName.length == 0){
+          const result = await conn.query("INSERT INTO `users`(`username`, `password`) VALUES (?,?)",[data["username"],data["password"]]);
+          var responseText = "Thank you for signing up, "+data["username"]+"."
+          socket.emit('createUser',{"response":responseText,"username":data["username"]});
+        } else {
+          socket.emit('userAlreadyExists',data["username"]);
+        }
+      } catch(err){
+        throw err;
+      }
+    })();
+  });
+
+  socket.on('logIn',function(data){
+    (async () => {
+      try{
+        const result = await conn.query("SELECT * FROM users WHERE username = ?",[data["username"]]);
+        if(result.length == 0){
+          socket.emit('userDNE',data["username"]);
+        } else if(result[0]["password"] !== data["password"]){
+          socket.emit('incorrectPassword',data);
+        } else {
+          var responseText = "Welcome back, <i>"+data["username"]+"</i>!";
+          socket.emit('logIn',{"response":responseText,"username":data["username"]});
+        }
       } catch(err){
         throw err;
       }
@@ -151,7 +179,7 @@ io.on('connection', (socket) => {
         for(let i=0; i<toArray.length; i++){
           await conn.query("INSERT INTO messageRecipients(messageId, toUserId) VALUES(?,?)", [insertResult["insertId"],toArray[i]]);
         }
-        socket.emit('createMessage',"Message sent!");
+        socket.emit('createMessage',{"response":"Message sent!"});
       } catch(err){
         throw err;
       }
@@ -160,10 +188,7 @@ io.on('connection', (socket) => {
 
 });
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/page.html');
-});
-app.use(express.static('.'));
+
 
 
 
@@ -171,4 +196,4 @@ let port = process.env.PORT;
 if (port == null || port == "") {
   port = 8000;
 }
-server.listen(port);
+server.listen(3000);

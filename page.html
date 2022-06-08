@@ -15,19 +15,19 @@
 			font-family: Verdana, sans-serif;
 		}
 		#controlPanel {
-			background-color: #DD9EEB;
+			background-color: #d4a373;
 			height: 100%;
+			width: 30%;
 			float: left;
+			line-height: 2;
 		}
 
 		#display {
 			padding-top: 10px;
 			padding-left: 10px;
 			height: 100%;
-			background-color: #eec0c6;
-			background-image: linear-gradient(315deg, #eec0c6 0%, #7ee8fa 60%);
-
-
+			background-color: #faedcd;
+			line-height: 1;
 			overflow: scroll;
 		}
 		.panelTitle {
@@ -38,11 +38,13 @@
 		}
 
 
-		#checkMessagesToPanel, #checkMessagesFromPanel, #newUserPanel, #newMessagePanel{
+		#checkMessagesPanel, #newUserPanel, #newMessagePanel{
 			border: 1px solid black;
 			position: relative;
-			padding-left: 3px;
-			padding-right: 3px;
+			padding: 3px;
+		}
+		textarea{
+			width: 98%;
 		}
 		input[type=text] {
 			width: 125px;
@@ -69,23 +71,37 @@
 			left: 10px;
 		}
 		.messageElement{
-			border: 1.5mm ridge rgba(211, 220, 50, .6);
-  		width: fit-content;
+			border: 0.5mm ridge rgba(211, 220, 50, .6);
+  			width: fit-content;
 			height: fit-content;
-			background-color: #eec0c6;
+			background-color: #e9edc9;
 			font-size: 20px;
+			line-height: 1.5;
 		}
 		.userElement{
-			border: 1.5mm ridge rgba(211, 220, 50, .6);
-  		width: fit-content;
+			border: 0.5mm ridge rgba(211, 220, 50, .6);
+  			width: fit-content;
 			height: fit-content;
-			background-color: #eec0c6;
+			background-color: #e9edc9;
 			font-size: 20px;
+			line-height: 1.5;
 		}
 
 		#suButton{
 			position: absolute;
 			left: 10px;
+		}
+		#sessionInfo{
+			position: absolute;
+			bottom: 1em;
+			padding: 5px;
+			margin-left: 2.5%;
+			margin-right: 2.5%;
+			width: 25%;
+			border-radius: 25px;
+			height: fit-content;
+			text-align: center;
+			background-color: #faedcd;
 		}
 
 	</style>
@@ -101,45 +117,35 @@
 
 	<div id="controlPanel">
 
-		<div id="checkMessagesToPanel">
-			<p class="panelTitle"><b>Check Your Messages</b></p>
-			<form autocomplete="off" action="javascript:checkMessagesTo();" method="GET">
-				<span id="to1">To:</span> <input autocomplete="off" type="text" name="to" id="checkMessagesTo"></input><br>
-				<input type="submit"></input>
-			</form>
-		</div>
-
-		<div id="checkMessagesFromPanel">
-			<p class="panelTitle"><b>Check Messages You Have Sent</b></p>
-			<form autocomplete="off" action="javascript:checkMessagesFrom();" method="GET">
-				<span id="from1">From:</span> <input autocomplete="off" type="text" id="checkMessagesFrom"></input><br>
-				<input type="submit"></input>
-			</form>
+		<div id="checkMessagesPanel">
+				<button onClick="checkMessagesTo()">Check Your Messages</button>
+				<button onClick="checkMessagesFrom()">Check Messages You Have Sent</button>
 		</div>
 
 		<div id="newMessagePanel">
 			<p class="panelTitle"><b>Send a Message</b></p>
-			<form autocomplete="off" id="createMessageForm" action="javascript:createMessage();" method="POST">
-				<span id="from2">From: </span><input autocomplete="off" type="text" id="newMessageFrom"></input><br>
-				<span id="to2">To:</span> <input autocomplete="off" type="text" id="newMessageTo" placeholder="user1, user2, user3"></input><br>
-				<span id="body">Message:</span><br>
+
+				To: <input autocomplete="off" type="text" id="newMessageTo" placeholder="user1, user2, user3"></input><br>
+				Message:<br>
 				<textarea rows=6 cols=30 id="newMessageMessage"></textarea><br>
-				<input type="submit"></input>
-			</form>
+				<button onClick="createMessage()">Submit Message</button>
+
 		</div>
 
 		<div id="newUserPanel">
-			<p class="panelTitle"><b>Create New User</b></p>
-			<form autocomplete="off" id="newUserForm" action="javascript:createUser();" method="POST">
+			<p class="panelTitle"><b>Log In/Sign up</b></p>
+
 				<span id="username">Username: </span><input autocomplete="off" type="text" id="createUserUsername"></input><br>
 				<span id="password">Password: </span><input autocomplete="off" type="password" id="createUserPassword"></input><br>
-				<span id="email">Email (optional): </span><input autocomplete="off" type="text" id="createUserEmail"></input><br>
-				<input type="submit"></input>
-			</form>
+				<button onClick="logIn()">Log in</button> <button onClick="createUser()">Create New User</button>
+
 		</div>
 		<br>
 		<button type="button" id="suButton">Show all users</button> <br> <br>
 
+		<div id="sessionInfo">
+			You are not logged in!
+		</div>
 
 	</div>
 
@@ -159,18 +165,37 @@
 	<script>
 
 	var socket = io();
+
+	var loggedIn = false;
+	var sessionUsername = "";
+
 	socket.on('listAllUsers',function(response){
 		var responseText = "<div id='displayMessagesHeader'>Here are all of the users in the database:<br><span>Click on a user to automatically put them in the \"To\" field.</span></div><br><br>";
 		for(var i=0; i<response.length; i++){
-			responseText+= "<div class='userElement' onclick='changeTo(\"" + response[i]["username"]+"\")'> ➼ " + response[i]["username"] + "</div>";
+			responseText+= "<div class='userElement' onclick='changeTo(\"" + response[i]["username"]+"\")'> ➼ " + response[i]["username"] + "</div><br>";
 		}
 		responseTextHere.innerHTML = responseText;
 	});
+	socket.on('userAlreadyExists',function(username){
+		responseTextHere.innerHTML = "The user <i>"+username+"</i> already exists. If that is you, log in with your password. Otherwise, try another username.";
+	});
 	socket.on('createUser',function(response){
-		responseTextHere.innerHTML = response;
+		responseTextHere.innerHTML = response["response"];
+		sessionUsername = response["username"];
+		loggedIn = true;
+		sessionInfo.innerHTML = "You are signed in as <i>"+sessionUsername+"</i>.";
+	});
+	socket.on('logIn',function(response){
+		responseTextHere.innerHTML = response["response"];
+		sessionUsername = response["username"];
+		loggedIn = true;
+		sessionInfo.innerHTML = "You are signed in as <i>"+sessionUsername+"</i>.";
+	});
+	socket.on('incorrectPassword',function(response){
+		responseTextHere.innerHTML = "Password for user <i>"+response["username"]+"</i> does not match database. Try another password.";
 	});
 	socket.on('createMessage',function(response){
-		responseTextHere.innerHTML = response;
+		responseTextHere.innerHTML = response["response"];
 	});
 	socket.on('userDNE',function(response){
 		responseTextHere.innerHTML = "User <i>"+response+"</i> does not exist.";
@@ -184,18 +209,22 @@
 	});
 	socket.on('checkMessagesFrom',function(response){
 		var responseText = "<div id='displayMessagesHeader'>Here are the messages that you have sent, <i>" + response[0]["from"] +"</i>:</div><br>";
-		for(let i=0; i<response.length; i++){
-			responseText += "<div class=\"messageElement\"><strong> ➼ To "+response[i]["to"]+":</strong> "+response[i]["body"]+"</div>";
+		for(let i=response.length-1; i>=0; i--){
+			responseText += "<div class=\"messageElement\"><strong> ➼ To "+response[i]["to"]+":</strong> "+response[i]["body"]+"</div><br>";
 		}
 		responseTextHere.innerHTML = responseText;
 	});
 	socket.on('checkMessagesTo',function(response){
 		var responseText = "<div id='displayMessagesHeader'>Here are your messages, <i>" + response[0]["to"] +"</i>:</div><br>";
-		for(let i=0; i<response.length; i++){
-			responseText += "<div class=\"messageElement\"><strong> ➼ From "+response[i]["from"]+":</strong> "+response[i]["body"]+"</div>";
+		for(let i=response.length-1; i>=0; i--){
+			responseText += "<div class=\"messageElement\"><strong> ➼ From "+response[i]["from"]+":</strong> "+response[i]["body"]+"</div><br>";
 		}
 		responseTextHere.innerHTML = responseText;
 	});
+
+	function updateSession(){
+
+	}
 
 
 
@@ -217,47 +246,68 @@
 	});
 
 
-		function changeTo(user){
-			document.getElementById("newMessageTo").value = user;
-		}
+
 		function checkMessagesTo() {
-			var to = document.getElementById("checkMessagesTo").value;
-			if(to!="")
-			socket.emit('checkMessagesTo',{"username":to});
+			if(loggedIn){
+				socket.emit('checkMessagesTo',{"username":sessionUsername});
+			} else {
+				responseTextHere.innerHTML = "You aren't logged in yet. Try creating a user first!";
+			}
 		}
 
 		function checkMessagesFrom() {
-			var from = document.getElementById("checkMessagesFrom").value;
-			if(from!="")
-			socket.emit('checkMessagesFrom',{"username":from});
+			if(loggedIn){
+				socket.emit('checkMessagesFrom',{"username":sessionUsername});
+			} else {
+				responseTextHere.innerHTML = "You aren't logged in yet. Try creating a user first!";
+			}
+
 		}
 
 		function createMessage(){
-			var from = document.getElementById("newMessageFrom").value;
-			var to = document.getElementById("newMessageTo").value;
-			var message = document.getElementById("newMessageMessage").value;
-			if(message=="") document.getElementById("responseTextHere").innerHTML = "Oops! Your message is empty.";
-			else if(from=="" || to=="") document.getElementById("responseTextHere").innerHTML =
-			"Make sure you enter who the message is from and to!";
-			else {
-				socket.emit('createMessage',{"from":from,"to":to,"body":message});
-				document.getElementById("createMessageForm").reset();
+			if(loggedIn){
+				var to = document.getElementById("newMessageTo").value;
+				var message = document.getElementById("newMessageMessage").value;
+				if(message=="") document.getElementById("responseTextHere").innerHTML = "Oops! Your message is empty.";
+				else if(to=="") document.getElementById("responseTextHere").innerHTML =
+				"Make sure you enter who the message is to!";
+				else {
+					socket.emit('createMessage',{"from":sessionUsername,"to":to,"body":message});
+					document.getElementById("newMessageTo").value = "";
+					document.getElementById("newMessageMessage").value = "";
+				}
+			} else {
+				responseTextHere.innerHTML = "You aren't logged in yet. Try creating a user first!";
 			}
+
 		}
 
 		function createUser(){
 			var username = document.getElementById("createUserUsername").value;
 			var password = document.getElementById("createUserPassword").value;
-			var email = document.getElementById("createUserEmail").value;
 			if(username=="") document.getElementById("responseTextHere").innerHTML = "Make sure you enter a username.";
 			else if(password=="") document.getElementById("responseTextHere").innerHTML = "Make sure you enter a password.";
 			else{
-				socket.emit('createUser',{"username":username,"password":password,"email":email});
-				document.getElementById("newUserForm").reset();
+				socket.emit('createUser',{"username":username,"password":password});
+				document.getElementById("createUserUsername").value = "";
+				document.getElementById("createUserPassword").value = "";
+			}
+		}
+		function logIn(){
+			var username = document.getElementById("createUserUsername").value;
+			var password = document.getElementById("createUserPassword").value;
+			if(username=="") document.getElementById("responseTextHere").innerHTML = "Make sure you enter a username.";
+			else if(password=="") document.getElementById("responseTextHere").innerHTML = "Make sure you enter a password.";
+			else{
+				socket.emit('logIn',{"username":username,"password":password});
+				document.getElementById("createUserUsername").value = "";
+				document.getElementById("createUserPassword").value = "";
 			}
 		}
 
-
+		function changeTo(user){
+			document.getElementById("newMessageTo").value = user;
+		}
 
 	</script>
 
