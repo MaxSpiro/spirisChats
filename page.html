@@ -23,7 +23,6 @@
 		#display {
 			padding-top: 10px;
 			padding-left: 10px;
-			/*background-color: #CFBFF7;*/
 			height: 100%;
 			background-color: #eec0c6;
 			background-image: linear-gradient(315deg, #eec0c6 0%, #7ee8fa 60%);
@@ -39,23 +38,12 @@
 		}
 
 
-		/*	NOTE: This, combined with the mods to the input[type=text] CSS, make the
-			fields of the form all line up on the right border (0px from the right)
-		*/
 		#checkMessagesToPanel, #checkMessagesFromPanel, #newUserPanel, #newMessagePanel{
 			border: 1px solid black;
 			position: relative;
 			padding-left: 3px;
 			padding-right: 3px;
 		}
-
-		/*	This, with the relative positioning of the panels (see above) is
-			one way to get the inputs to line up all nicely and flush against
-			the right hand side of the panels.
-			Position absolute positions elements relative to their nearest
-			positioned ancestor so this is putting items 0px from the right
-			hand side of the panel divs...lines them up nicely.
-		*/
 		input[type=text] {
 			width: 125px;
 			position: absolute;
@@ -75,7 +63,7 @@
 			position: relative;
 			left: 10px;
 		}
-		#displayMessagesHeader > span {
+		#displayMessagesHeader > span{
 			position: absolute;
 			font-size: 24px;
 			left: 10px;
@@ -95,47 +83,9 @@
 			font-size: 20px;
 		}
 
-		#ruButton, #suButton{
+		#suButton{
 			position: absolute;
 			left: 10px;
-		}
-
-		.lds-ring {
-		  display: inline-block;
-		  position: absolute;
-			left: 50%;
-			top: 10%;
-		  width: 160px;
-		  height: 160px;
-		}
-		.lds-ring div {
-		  box-sizing: border-box;
-		  display: block;
-		  position: absolute;
-		  width: 128px;
-		  height: 128px;
-		  margin: 16px;
-		  border: 16px solid #fff;
-		  border-radius: 50%;
-		  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-		  border-color: #fff transparent transparent transparent;
-		}
-		.lds-ring div:nth-child(1) {
-		  animation-delay: -0.45s;
-		}
-		.lds-ring div:nth-child(2) {
-		  animation-delay: -0.3s;
-		}
-		.lds-ring div:nth-child(3) {
-		  animation-delay: -0.15s;
-		}
-		@keyframes lds-ring {
-		  0% {
-		    transform: rotate(0deg);
-		  }
-		  100% {
-		    transform: rotate(360deg);
-		  }
 		}
 
 	</style>
@@ -147,43 +97,31 @@
 
 
 
-
-<!-- LEFT BLANK ON PURPOSE...SCROLLING AID...OR SOMETHING -->
-
-
-
-
-
-
-
-
 <body>
 
 	<div id="controlPanel">
 
 		<div id="checkMessagesToPanel">
-			<p class="panelTitle"><b>Check Messages To</b></p>
-			<form action="javascript:checkMessagesTo();" method="GET">
-				<span id="to1">To:</span> <input type="text" name="to" id="checkMessagesTo"></input><br>
-				<span id="filter1">Filter (Optional): </span><input type="text" id="checkMessagesToFilter" placeholder="word1, word2, word3"></input><br>
+			<p class="panelTitle"><b>Check Your Messages</b></p>
+			<form autocomplete="off" action="javascript:checkMessagesTo();" method="GET">
+				<span id="to1">To:</span> <input autocomplete="off" type="text" name="to" id="checkMessagesTo"></input><br>
 				<input type="submit"></input>
 			</form>
 		</div>
 
 		<div id="checkMessagesFromPanel">
-			<p class="panelTitle"><b>Check Messages From</b></p>
-			<form action="javascript:checkMessagesFrom();" method="GET">
-				<span id="from1">From:</span> <input type="text" id="checkMessagesFrom"></input><br>
-				<span id="filter2">Filter (Optional): </span><input type="text" id="checkMessagesFromFilter" placeholder="word1, word2, word3"></input><br>
+			<p class="panelTitle"><b>Check Messages You Have Sent</b></p>
+			<form autocomplete="off" action="javascript:checkMessagesFrom();" method="GET">
+				<span id="from1">From:</span> <input autocomplete="off" type="text" id="checkMessagesFrom"></input><br>
 				<input type="submit"></input>
 			</form>
 		</div>
 
 		<div id="newMessagePanel">
-			<p class="panelTitle"><b>Create New Message</b></p>
-			<form id="createMessageForm" action="javascript:createMessage();" method="POST">
-				<span id="from2">From: </span><input type="text" id="newMessageFrom"></input><br>
-				<span id="to2">To:</span> <input type="text" id="newMessageTo" placeholder="user1, user2, user3"></input><br>
+			<p class="panelTitle"><b>Send a Message</b></p>
+			<form autocomplete="off" id="createMessageForm" action="javascript:createMessage();" method="POST">
+				<span id="from2">From: </span><input autocomplete="off" type="text" id="newMessageFrom"></input><br>
+				<span id="to2">To:</span> <input autocomplete="off" type="text" id="newMessageTo" placeholder="user1, user2, user3"></input><br>
 				<span id="body">Message:</span><br>
 				<textarea rows=6 cols=30 id="newMessageMessage"></textarea><br>
 				<input type="submit"></input>
@@ -192,35 +130,25 @@
 
 		<div id="newUserPanel">
 			<p class="panelTitle"><b>Create New User</b></p>
-			<form id="newUserForm" action="javascript:createUser();" method="POST">
-				<span id="username">Username: </span><input type="text" id="createUserUsername"></input><br>
-				<span id="password">Password: </span><input type="password" id="createUserPassword"></input><br>
-				<span id="email">Email (optional): </span><input type="text" id="createUserEmail"></input><br>
+			<form autocomplete="off" id="newUserForm" action="javascript:createUser();" method="POST">
+				<span id="username">Username: </span><input autocomplete="off" type="text" id="createUserUsername"></input><br>
+				<span id="password">Password: </span><input autocomplete="off" type="password" id="createUserPassword"></input><br>
+				<span id="email">Email (optional): </span><input autocomplete="off" type="text" id="createUserEmail"></input><br>
 				<input type="submit"></input>
 			</form>
 		</div>
 		<br>
 		<button type="button" id="suButton">Show all users</button> <br> <br>
-		<button type="button" id="ruButton" name="button">Find a random username</button>
 
 
 	</div>
 
 	<div id="display">
 
-		<div class="lds-ring" id="loadingAnimation" style="display:none;">
-			<div></div><div></div><div></div><div></div></div>
-
-		<div id="responseTextHere"><div id="starting">Start by creating a user</div></div>
+		<div id="responseTextHere"><div id="displayMessagesHeader">Start by creating a user or clicking the <i>Show all users</i> button.</div></div>
 	</div>
 
 
-
-
-
-
-
-<!-- LEFT BLANK ON PURPOSE...SCROLLING AID...OR SOMETHING -->
 
 
 
@@ -231,36 +159,53 @@
 	<script>
 
 	var socket = io();
+	socket.on('listAllUsers',function(response){
+		var responseText = "<div id='displayMessagesHeader'>Here are all of the users in the database:<br><span>Click on a user to automatically put them in the \"To\" field.</span></div><br><br>";
+		for(var i=0; i<response.length; i++){
+			responseText+= "<div class='userElement' onclick='changeTo(\"" + response[i]["username"]+"\")'> ➼ " + response[i]["username"] + "</div>";
+		}
+		responseTextHere.innerHTML = responseText;
+	});
+	socket.on('createUser',function(response){
+		responseTextHere.innerHTML = response;
+	});
+	socket.on('createMessage',function(response){
+		responseTextHere.innerHTML = response;
+	});
+	socket.on('userDNE',function(response){
+		responseTextHere.innerHTML = "User <i>"+response+"</i> does not exist.";
+	});
+	socket.on('noMessages',function(response){
+		if(response["type"] == "from"){
+			responseTextHere.innerHTML = "User <i>" + response["username"]+"</i> has not sent any messages!";
+		} else if(response["type"] == "to"){
+			responseTextHere.innerHTML = "User <i>" + response["username"]+"</i> has not received any messages!";
+		}
+	});
+	socket.on('checkMessagesFrom',function(response){
+		var responseText = "<div id='displayMessagesHeader'>Here are the messages that you have sent, <i>" + response[0]["from"] +"</i>:</div><br>";
+		for(let i=0; i<response.length; i++){
+			responseText += "<div class=\"messageElement\"><strong> ➼ To "+response[i]["to"]+":</strong> "+response[i]["body"]+"</div>";
+		}
+		responseTextHere.innerHTML = responseText;
+	});
+	socket.on('checkMessagesTo',function(response){
+		var responseText = "<div id='displayMessagesHeader'>Here are your messages, <i>" + response[0]["to"] +"</i>:</div><br>";
+		for(let i=0; i<response.length; i++){
+			responseText += "<div class=\"messageElement\"><strong> ➼ From "+response[i]["from"]+":</strong> "+response[i]["body"]+"</div>";
+		}
+		responseTextHere.innerHTML = responseText;
+	});
 
-	function changeTo(user){
-		document.getElementById("newMessageTo").value = user;
-	}
 
-	var responseText = "";
+
 	$(document).ready(function(){
 		let display = document.getElementById('display');
-		$("#loadingAnimation").hide();
 
 		$("#suButton").click(function(){
-			sendAjaxGet("FindUser.php?all=true")
+			socket.emit('listAllUsers');
 		});
 
-
-		$("#ruButton").click(function(){
-
-			sendAjaxGet("RandomUser.php",false);
-			$("#loadingAnimation").show();
-
-			responseTextHere.innerHTML = "Generating random user...";
-
-						setTimeout(function(){
-							$("#loadingAnimation").hide();
-							responseTextHere.innerHTML = responseText;
-							document.getElementById("newMessageTo").value =
-								responseText.substring(32,responseText.indexOf(".")-4);
-						},3000);
-
-		});
 		$('input, textarea, select')
                 .not(':input[type=button], :input[type=submit], :input[type=reset]').focus(function(){
 			$(this).css("background-color","#cccccc");
@@ -269,40 +214,22 @@
                 .not(':input[type=button], :input[type=submit], :input[type=reset]').blur(function(){
 			$(this).css("background-color","#ffffff");
 		});
-
-		var savedHTML;
-		$("#filter1, #filter2").hover(
-			function(){ // in
-				$(this).css({"color": "#8B80F9", "font-weight": "bold", "font-size":"15px"});
-				savedHTML = $("#responseTextHere").html();
-				$("#responseTextHere").html("Enter a comma-separated list of words you want to search for. <br>Messages with any of the words will be shown.");
-			}, function(){ // out
-				$(this).css({"color": "black", "font-weight": "normal", "font-size":"14px"});
-				$("#responseTextHere").html(savedHTML);
-			}
-		);
-
 	});
 
-		/* 	It is ABSOLUTELY REQUIRED that you change the names of these methods
-			so that they don't have silly names...also, be sure to give all of your form
-			elements good names and unique IDs.
-		*/
 
+		function changeTo(user){
+			document.getElementById("newMessageTo").value = user;
+		}
 		function checkMessagesTo() {
 			var to = document.getElementById("checkMessagesTo").value;
-			var filter = document.getElementById("checkMessagesToFilter").value;
-			var isFilter = filter=="" ? "false" : "true";
 			if(to!="")
-			sendAjaxGet("CheckMessages.php?username="+to+"&to=True"+"&filter="+filter+"&isFilter="+isFilter);
+			socket.emit('checkMessagesTo',{"username":to});
 		}
 
 		function checkMessagesFrom() {
 			var from = document.getElementById("checkMessagesFrom").value;
-			var filter = document.getElementById("checkMessagesFromFilter").value;
-			var isFilter = filter=="" ? "false" : "true";
 			if(from!="")
-			sendAjaxGet("CheckMessages.php?username="+from+"&to=False"+"&filter="+filter+"&isFilter="+isFilter);
+			socket.emit('checkMessagesFrom',{"username":from});
 		}
 
 		function createMessage(){
@@ -313,7 +240,7 @@
 			else if(from=="" || to=="") document.getElementById("responseTextHere").innerHTML =
 			"Make sure you enter who the message is from and to!";
 			else {
-				sendAjaxGet("CreateMessage.php?from="+from+"&to="+to+"&body="+message);
+				socket.emit('createMessage',{"from":from,"to":to,"body":message});
 				document.getElementById("createMessageForm").reset();
 			}
 		}
@@ -325,38 +252,11 @@
 			if(username=="") document.getElementById("responseTextHere").innerHTML = "Make sure you enter a username.";
 			else if(password=="") document.getElementById("responseTextHere").innerHTML = "Make sure you enter a password.";
 			else{
-				sendAjaxGet("AddUser.php?username="+username+"&pw="+password+"&email="+email);
+				socket.emit('createUser',{"username":username,"password":password,"email":email});
 				document.getElementById("newUserForm").reset();
 			}
 		}
 
-		function findUsername(){
-			var userId = document.getElementById("findUsernameUserId").value;
-			if(userId=="") document.getElementById("responseTextHere").innerHTML = "Enter a user ID";
-			else if(!(/^\d+$/.test(userId))) document.getElementById("responseTextHere").innerHTML = "The user ID should be a number";
-			else{
-				sendAjaxGet("FindUser.php?userId="+userId);
-			}
-		}
-
-		function sendAjaxGet(url,set = true){
-      let xhr = new XMLHttpRequest();
-
-      xhr.onreadystatechange = function(){
-        if(xhr.readyState == 4 && xhr.status == 200){
-          let display = document.getElementById('display');
-					if(set)
-          	responseTextHere.innerHTML = xhr.responseText;
-					else{
-						responseText = new String(xhr.responseText);
-					}
-        }
-      }
-      xhr.open("GET",url,true);
-      xhr.send(null);
-
-
-    }
 
 
 	</script>
