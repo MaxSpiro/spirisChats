@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
   socket.on('listAllUsers',function(){
     (async () => {
       try{
-        const result = await conn.query("SELECT * FROM users");
+        const result = await conn.query("SELECT `username` FROM users");
         socket.emit('listAllUsers',result);
       } catch(err){
         throw err;
@@ -192,8 +192,12 @@ io.on('connection', (socket) => {
 
 
 
-let port = process.env.PORT;
-if (port == null || port == "") {
-  port = 8000;
-}
-server.listen(port);
+// let port = process.env.PORT;
+// if (port == null || port == "") {
+//   port = 8000;
+// }
+// server.listen(port);
+
+server.listen(3000, () => {
+  console.log('listening on *:3000');
+});
