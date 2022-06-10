@@ -100,24 +100,42 @@
 			text-align: center;
 			background-color: #faedcd;
 		}
-		#liveChat{
+		#liveChatPanel{
 			background-color: white;
-			position: absolute;
-			left: 5px;
-			width: 27%;
-			margin-left: 1.5%;
-			margin-right: 1.5%;
-			height: 100px;
-		}
-		#messagesHere{
-			background-color: blue;
-			position: absolute;
-			left: 5px;
+			position: relative;
+        	margin: 5px;
+        	margin-top: 0px;
+        	margin-bottom: 0px;
+			height: 20%;
 		}
 		#input{
-			position: absolute;
-			bottom: 5px;
-			left: 5%;
+			position: relative;
+			width: 100%;
+			color: #535353;
+			padding-right: 10px;
+			padding-left: 10px;
+			padding-top: 5px;
+			padding-bottom: 5px;
+			border: 0px;
+			border-bottom: 2px solid gainsboro;
+		}
+		.indiv {
+			padding: 5px;
+			color: #535353;
+			font-family: Verdana;
+			display: flex;
+			align-items: center;
+			justify-content: center;    
+		}
+		.indivChat {
+			padding: 5px;
+			color: #535353;
+			font-family: Verdana;
+		}
+		#liveChatPanelOutput {
+			height: 80%;
+			overflow-x: auto;
+       		overflow-y: auto;
 		}
 	</style>
 </head>
@@ -143,10 +161,12 @@
 		</div>
 		<br>
 		<button type="button" id="suButton">Show all users</button> <br> <br>
-		<div id="liveChat">
-			<div id="messagesHere">
+		<div id="liveChatPanel">
+			<div id="liveChatPanelOutput">
 			</div>
-			<input type="text" id="input" placeholder="Type message here...">
+			<div class="indiv">
+				<input type="text" id="input" placeholder="Type message here...">
+			</div>
 		</div>
 		<div id="sessionInfo">
 			You are not logged in!
@@ -171,10 +191,10 @@
     }
 });
 	socket.on('sendMessage',function(data){
-		if(sessionUsername)
-			messagesHere.innerHTML += "<div>"+data["username"]+": "+data["message"]+"</div>";
+		if(data["username"])
+			liveChatPanelOutput.innerHTML += "<div class='indivChat'><div>"+data["username"]+": "+data["message"]+"</div></div>";
 		else
-			messagesHere.innerHTML += "<div>Guest: "+data["message"]+"</div>";
+			liveChatPanelOutput.innerHTML += "<div class='indivChat'><div>Guest: "+data["message"]+"</div></div>";
 	});
 
 	socket.on('listAllUsers',function(response){
