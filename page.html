@@ -21,7 +21,6 @@
 			float: left;
 			line-height: 2;
 		}
-
 		#display {
 			padding-top: 10px;
 			padding-left: 10px;
@@ -36,15 +35,14 @@
 			color: #000000;
 			text-align: center;
 		}
-
-
 		#checkMessagesPanel, #newUserPanel, #newMessagePanel{
-			border: 1px solid black;
+			/* border: 1px solid black; */
 			position: relative;
 			padding: 3px;
 		}
 		textarea{
 			width: 98%;
+			resize: none;
 		}
 		input[type=text] {
 			width: 125px;
@@ -55,9 +53,6 @@
 			width: 125px;
 			position: absolute;
 			right: 0px;
-		}
-		#input{
-			width: 20%;
 		}
 		#responseTextHere{
 			font-size: 24px;
@@ -89,7 +84,6 @@
 			font-size: 20px;
 			line-height: 1.5;
 		}
-
 		#suButton{
 			position: absolute;
 			left: 10px;
@@ -107,7 +101,7 @@
 			background-color: #faedcd;
 		}
 		#liveChat{
-			background-color: red;
+			background-color: white;
 			position: absolute;
 			left: 5px;
 			width: 27%;
@@ -125,25 +119,14 @@
 			bottom: 5px;
 			left: 5%;
 		}
-
 	</style>
-
 </head>
-
-
-
-
-
-
 <body>
-
 	<div id="controlPanel">
-
 		<div id="checkMessagesPanel">
 				<button onClick="checkMessagesTo()">Check Your Messages</button>
 				<button onClick="checkMessagesFrom()">Check Messages You Have Sent</button>
 		</div>
-
 		<div id="newMessagePanel">
 			<p class="panelTitle"><b>Send a Message</b></p>
 
@@ -151,45 +134,28 @@
 				Message:<br>
 				<textarea rows=6 cols=30 id="newMessageMessage"></textarea><br>
 				<button onClick="createMessage()">Submit Message</button>
-
 		</div>
-
 		<div id="newUserPanel">
 			<p class="panelTitle"><b>Log In/Sign up</b></p>
-
 				<span id="username">Username: </span><input autocomplete="off" type="text" id="createUserUsername"></input><br>
 				<span id="password">Password: </span><input autocomplete="off" type="password" id="createUserPassword"></input><br>
 				<button onClick="logIn()">Log in</button> <button onClick="createUser()">Create New User</button>
-
 		</div>
 		<br>
 		<button type="button" id="suButton">Show all users</button> <br> <br>
-
 		<div id="liveChat">
 			<div id="messagesHere">
-
 			</div>
 			<input type="text" id="input" placeholder="Type message here...">
 		</div>
-
 		<div id="sessionInfo">
 			You are not logged in!
 		</div>
-
 	</div>
-
 	<div id="display">
 
 		<div id="responseTextHere"><div id="displayMessagesHeader">Start by creating a user or clicking the <i>Show all users</i> button.</div></div>
 	</div>
-
-
-
-
-
-
-
-
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
 
