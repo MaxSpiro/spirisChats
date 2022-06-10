@@ -198,6 +198,19 @@
 	var loggedIn = false;
 	var sessionUsername = "";
 
+	document.querySelector('#input').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      socket.emit('sendMessage',{"message":document.getElementById("input").value,"username":sessionUsername});
+			document.getElementById("input").value = "";
+    }
+});
+	socket.on('sendMessage',function(data){
+		if(sessionUsername)
+			messagesHere.innerHTML += "<div>"+data["username"]+": "+data["message"]+"</div>";
+		else
+			messagesHere.innerHTML += "<div>Guest: "+data["message"]+"</div>";
+	});
+
 	socket.on('listAllUsers',function(response){
 		var responseText = "<div id='displayMessagesHeader'>Here are all of the users in the database:<br><span>Click on a user to automatically put them in the \"To\" field.</span></div><br><br>";
 		for(var i=0; i<response.length; i++){

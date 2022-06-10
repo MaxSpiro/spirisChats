@@ -37,6 +37,10 @@ app.use(express.static('.'));
 
 io.on('connection', (socket) => {
 
+socket.on('sendMessage', function(data){
+  io.emit('sendMessage',data);
+});
+
   socket.on('listAllUsers',async function(){
       try{
         const result = await conn.query("SELECT `username` FROM users");
