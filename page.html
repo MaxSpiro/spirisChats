@@ -181,20 +181,15 @@
 
 	var socket = io();
 
-	var loggedIn = false;
-	var sessionUsername = "";
 
 	document.querySelector('#input').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
-      socket.emit('sendMessage',{"message":document.getElementById("input").value,"username":sessionUsername});
+      socket.emit('sendMessage',{"message":document.getElementById("input").value});
 			document.getElementById("input").value = "";
     }
 });
 	socket.on('sendMessage',function(data){
-		if(data["username"])
 			liveChatPanelOutput.innerHTML += "<div class='indivChat'><div>"+data["username"]+": "+data["message"]+"</div></div>";
-		else
-			liveChatPanelOutput.innerHTML += "<div class='indivChat'><div>Guest: "+data["message"]+"</div></div>";
 	});
 
 	socket.on('listAllUsers',function(response){
@@ -209,15 +204,11 @@
 	});
 	socket.on('createUser',function(response){
 		responseTextHere.innerHTML = response["response"];
-		sessionUsername = response["username"];
-		loggedIn = true;
-		sessionInfo.innerHTML = "You are signed in as <i>"+sessionUsername+"</i>.";
+		sessionInfo.innerHTML = "You are signed in as <i>"+response["username"]+"</i>.";
 	});
 	socket.on('logIn',function(response){
 		responseTextHere.innerHTML = response["response"];
-		sessionUsername = response["username"];
-		loggedIn = true;
-		sessionInfo.innerHTML = "You are signed in as <i>"+sessionUsername+"</i>.";
+		sessionInfo.innerHTML = "You are signed in as <i>"+response["username"]+"</i>.";
 	});
 	socket.on('incorrectPassword',function(response){
 		responseTextHere.innerHTML = "Password for user <i>"+response["username"]+"</i> does not match database. Try another password.";
@@ -249,10 +240,10 @@
 		}
 		responseTextHere.innerHTML = responseText;
 	});
+	socket.on('notLoggedIn',function(){
+		responseTextHere.innerHTML = "You aren't logged in yet. Try creating a user first!";
+	});
 
-	function updateSession(){
-
-	}
 
 
 
@@ -276,37 +267,26 @@
 
 
 		function checkMessagesTo() {
-			if(loggedIn){
-				socket.emit('checkMessagesTo',{"username":sessionUsername});
-			} else {
-				responseTextHere.innerHTML = "You aren't logged in yet. Try creating a user first!";
-			}
+				socket.emit('checkMessagesTo');
+
 		}
 
 		function checkMessagesFrom() {
-			if(loggedIn){
-				socket.emit('checkMessagesFrom',{"username":sessionUsername});
-			} else {
-				responseTextHere.innerHTML = "You aren't logged in yet. Try creating a user first!";
-			}
+				socket.emit('checkMessagesFrom');
 
 		}
 
 		function createMessage(){
-			if(loggedIn){
 				var to = document.getElementById("newMessageTo").value;
 				var message = document.getElementById("newMessageMessage").value;
 				if(message=="") document.getElementById("responseTextHere").innerHTML = "Oops! Your message is empty.";
 				else if(to=="") document.getElementById("responseTextHere").innerHTML =
 				"Make sure you enter who the message is to!";
 				else {
-					socket.emit('createMessage',{"from":sessionUsername,"to":to,"body":message});
+					socket.emit('createMessage',{"to":to,"body":message});
 					document.getElementById("newMessageTo").value = "";
 					document.getElementById("newMessageMessage").value = "";
 				}
-			} else {
-				responseTextHere.innerHTML = "You aren't logged in yet. Try creating a user first!";
-			}
 
 		}
 

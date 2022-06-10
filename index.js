@@ -37,8 +37,14 @@ app.use(express.static('.'));
 
 io.on('connection', (socket) => {
 
+  var sessionUsername = "";
+
 socket.on('sendMessage', function(data){
-  io.emit('sendMessage',data);
+  if(sessionUsername)
+    io.emit('sendMessage',{"message":data["message"],"username":sessionUsername});
+  else {
+    io.emit('sendMessage',{"message":data["message"],"username":"Guest"})
+  }
 });
 
   socket.on('listAllUsers',async function(){
@@ -52,11 +58,16 @@ socket.on('sendMessage', function(data){
 
   socket.on('createUser',async function(data){
       try{
+        if(!sessionUsername){
+          socket.emit('notLoggedIn');
+          return;
+        }
         const usersWithSameName = await conn.query("SELECT * FROM users WHERE username = ?",[data["username"]]);
         if(usersWithSameName.length == 0){
           const result = await conn.query("INSERT INTO `users`(`username`, `password`) VALUES (?,?)",[data["username"],data["password"]]);
           var responseText = "Thank you for signing up, "+data["username"]+"."
           socket.emit('createUser',{"response":responseText,"username":data["username"]});
+          sessionUsername = data["username"];
         } else {
           socket.emit('userAlreadyExists',data["username"]);
         }
@@ -75,6 +86,7 @@ socket.on('sendMessage', function(data){
         } else {
           var responseText = "Welcome back, <i>"+data["username"]+"</i>!";
           socket.emit('logIn',{"response":responseText,"username":data["username"]});
+          sessionUsername = data["username"];
         }
       } catch(err){
         throw err;
@@ -82,16 +94,20 @@ socket.on('sendMessage', function(data){
     });
 
 
-  socket.on('checkMessagesFrom',async function(data){
+  socket.on('checkMessagesFrom',async function(){
       try{
-        const fromUserIdResult = await conn.query("SELECT userId FROM users WHERE username = ?", [data["username"]]);
+        if(!sessionUsername){
+          socket.emit('notLoggedIn');
+          return;
+        }
+        const fromUserIdResult = await conn.query("SELECT userId FROM users WHERE username = ?", [sessionUsername]);
         if(fromUserIdResult.length == 0){
-          socket.emit('userDNE',data["username"]);
+          socket.emit('userDNE',sessionUsername);
         } else {
           let fromUserId = fromUserIdResult[0]["userId"];
           const messagesResult = await conn.query("SELECT * FROM messages WHERE messages.fromUserId = ?",[fromUserId]);
           if(messagesResult.length == 0){
-            socket.emit('noMessages',{"type":"from","username":data["username"]}); // TODO
+            socket.emit('noMessages',{"type":"from","username":sessionUsername});
           } else {
             let messagesOutput = [{}];
             for(let i = 0; i < messagesResult.length; i++){
@@ -102,7 +118,7 @@ socket.on('sendMessage', function(data){
                 toUsernames += toUsernameResult[j]["username"]+", ";
               }
               toUsernames = toUsernames.substring(0,toUsernames.length-2);
-              messagesOutput[i] = {"body":messagesResult[i]["body"],"to":toUsernames,"from":data["username"]};
+              messagesOutput[i] = {"body":messagesResult[i]["body"],"to":toUsernames,"from":sessionUsername};
             }
             socket.emit('checkMessagesFrom',messagesOutput);
           }
@@ -112,28 +128,32 @@ socket.on('sendMessage', function(data){
       }
     });
 
-  socket.on('checkMessagesTo',async function(data){
+  socket.on('checkMessagesTo',async function(){
       try{
-        const toUserIdResult = await conn.query("SELECT userId FROM users WHERE username = ?",[data["username"]]);
+        if(!sessionUsername){
+          socket.emit('notLoggedIn');
+          return;
+        }
+        const toUserIdResult = await conn.query("SELECT userId FROM users WHERE username = ?",[sessionUsername]);
         if(toUserIdResult.length == 0){
-          socket.emit('userDNE',data["username"]);
+          socket.emit('userDNE',sessionUsername);
           return;
         }
         let toUserId = toUserIdResult[0]["userId"];
         const messagesResult = await conn.query("SELECT * FROM messages JOIN messageRecipients WHERE messageRecipients.messageId = messages.messageId AND messageRecipients.toUserId = ?",[toUserId]);
         if(messagesResult.length == 0){
-          socket.emit('noMessages',{"type":"to","username":data["username"]});
+          socket.emit('noMessages',{"type":"to","username":sessionUsername});
           return;
         }
         let messagesOutput = [{}];
         for(let i = 0; i < messagesResult.length; i++){
           const fromUsernameResult = await conn.query("SELECT * FROM users WHERE userId = ?",messagesResult[i]["fromUserId"]);
           if(fromUsernameResult.length == 0){
-            messagesOutput[i] = {"body":messagesResult[i]["body"],"to":data["username"],"from":"<i>unknown</i>"};
+            messagesOutput[i] = {"body":messagesResult[i]["body"],"to":sessionUsername,"from":"<i>unknown</i>"};
             continue;
           }
           let fromUsername = fromUsernameResult[0]["username"];
-          messagesOutput[i] = {"body":messagesResult[i]["body"],"to":data["username"],"from":fromUsername};
+          messagesOutput[i] = {"body":messagesResult[i]["body"],"to":sessionUsername,"from":fromUsername};
         }
         socket.emit('checkMessagesTo',messagesOutput)
       } catch(err){
@@ -145,6 +165,10 @@ socket.on('sendMessage', function(data){
 
   socket.on('createMessage',async function(data){
       try{
+        if(!sessionUsername){
+          socket.emit('notLoggedIn');
+          return;
+        }
         // First, VERIFY ALL USERS IN "TO" and change toArray from usernames to userIDs
         let toArray = data["to"].split(", ");
         for(let i=0; i<toArray.length; i++){
@@ -158,7 +182,7 @@ socket.on('sendMessage', function(data){
         }
 
         // Then, get FROM ID
-        const fromUserIdResult = await conn.query("SELECT userId FROM users WHERE username= ? ",[data["from"]]);
+        const fromUserIdResult = await conn.query("SELECT userId FROM users WHERE username= ? ",[sessionUsername]);
         if(fromUserIdResult.length == 0){
           socket.emit('userDNE',data["from"]);
           return;
