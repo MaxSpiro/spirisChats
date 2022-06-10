@@ -13,11 +13,11 @@
 		}
 		*{
 			font-family: Verdana, sans-serif;
+			color: black;
 		}
 		#controlPanel {
 			background-color: #d4a373;
 			height: 100%;
-			width: 30%;
 			float: left;
 			line-height: 2;
 		}
@@ -27,22 +27,35 @@
 			height: 100%;
 			background-color: #faedcd;
 			line-height: 1;
-			overflow: scroll;
+			overflow-x: auto;
+        	overflow-y: auto;
 		}
 		.panelTitle {
 			padding: 0;
 			margin: 0;
-			color: #000000;
 			text-align: center;
+			font-size: 15px;
+			font-weight: 700;
 		}
-		#checkMessagesPanel, #newUserPanel, #newMessagePanel{
-			/* border: 1px solid black; */
+		#checkMessagesPanel, #newUserPanel, #newMessagePanel, #showUsersPanel, #liveChatPanel{
 			position: relative;
-			padding: 3px;
+			background-color: #faedcd;
+        	margin: 5px;
+        	margin-top: 0px;
+        	margin-bottom: 0px;
+		}
+		#checkMessagesPanel {
+			margin-top: 5px;
 		}
 		textarea{
-			width: 98%;
 			resize: none;
+			position: relative;
+			padding-right: 10px;
+			padding-left: 10px;
+			padding-top: 5px;
+			padding-bottom: 5px;
+			border: 0px;
+			border-bottom: 2px solid #d4a373;
 		}
 		input[type=text] {
 			width: 125px;
@@ -84,10 +97,6 @@
 			font-size: 20px;
 			line-height: 1.5;
 		}
-		#suButton{
-			position: absolute;
-			left: 10px;
-		}
 		#sessionInfo{
 			position: absolute;
 			bottom: 1em;
@@ -100,28 +109,38 @@
 			text-align: center;
 			background-color: #faedcd;
 		}
-		#liveChatPanel{
-			background-color: white;
-			position: relative;
-        	margin: 5px;
-        	margin-top: 0px;
-        	margin-bottom: 0px;
-			height: 20%;
-		}
-		#input{
+		input[type=text] {
 			position: relative;
 			width: 100%;
-			color: #535353;
 			padding-right: 10px;
 			padding-left: 10px;
 			padding-top: 5px;
 			padding-bottom: 5px;
 			border: 0px;
-			border-bottom: 2px solid gainsboro;
+			border-bottom: 2px solid #d4a373;
+		}
+		input[type=password] {
+			position: relative;
+			width: 100%;
+			padding-right: 10px;
+			padding-left: 10px;
+			padding-top: 5px;
+			padding-bottom: 5px;
+			border: 0px;
+			border-bottom: 2px solid #d4a373;
+      	}
+		#input{
+			position: relative;
+			width: 100%;
+			padding-right: 10px;
+			padding-left: 10px;
+			padding-top: 5px;
+			padding-bottom: 5px;
+			border: 0px;
+			border-bottom: 2px solid #d4a373;
 		}
 		.indiv {
 			padding: 5px;
-			color: #535353;
 			font-family: Verdana;
 			display: flex;
 			align-items: center;
@@ -129,11 +148,10 @@
 		}
 		.indivChat {
 			padding: 5px;
-			color: #535353;
 			font-family: Verdana;
 		}
 		#liveChatPanelOutput {
-			height: 80%;
+			height: 20em;;
 			overflow-x: auto;
        		overflow-y: auto;
 		}
@@ -142,25 +160,46 @@
 <body>
 	<div id="controlPanel">
 		<div id="checkMessagesPanel">
+			<div class="indiv">
 				<button onClick="checkMessagesTo()">Check Your Messages</button>
+			</div>
+			<div class="indiv">
 				<button onClick="checkMessagesFrom()">Check Messages You Have Sent</button>
+			</div>
 		</div>
+		<p class="panelTitle"><b>Send a Message</b></p>
 		<div id="newMessagePanel">
-			<p class="panelTitle"><b>Send a Message</b></p>
-
-				To: <input autocomplete="off" type="text" id="newMessageTo" placeholder="user1, user2, user3"></input><br>
-				Message:<br>
-				<textarea rows=6 cols=30 id="newMessageMessage"></textarea><br>
-				<button onClick="createMessage()">Submit Message</button>
+				<div class="indiv">
+					<input autocomplete="off" type="text" id="newMessageTo" placeholder="To user1, user2, user3"></input><br>
+				</div>
+				<div class="indiv">
+					<textarea rows=6 cols=30 id="newMessageMessage"></textarea><br>
+				</div>
+				<div class="indiv">
+					<button onClick="createMessage()">Submit Message</button>
+				</div>
 		</div>
+		<p class="panelTitle"><b>Log In/Sign up</b></p>
 		<div id="newUserPanel">
-			<p class="panelTitle"><b>Log In/Sign up</b></p>
-				<span id="username">Username: </span><input autocomplete="off" type="text" id="createUserUsername"></input><br>
-				<span id="password">Password: </span><input autocomplete="off" type="password" id="createUserPassword"></input><br>
-				<button onClick="logIn()">Log in</button> <button onClick="createUser()">Create New User</button>
+				<div class="indiv">
+					<input autocomplete="off" type="text" id="createUserUsername" placeholder="Username"></input><br>
+				</div>
+				<div class="indiv">
+					<input autocomplete="off" type="password" id="createUserPassword" placeholder="Password"></input><br>
+				</div>
+				<div class="indiv">
+					<button onClick="logIn()">Log in</button>
+				</div>
+				<div class="indiv">
+					<button onClick="createUser()">Create New User</button>
+				</div>
 		</div>
-		<br>
-		<button type="button" id="suButton">Show all users</button> <br> <br>
+		<div id="showUsersPanel">
+			<div class="indiv">
+				<button type="button" id="suButton">Show all users</button>
+			</div>
+		</div>
+		<p class="panelTitle"><b>Live Chat Panel</b></p>
 		<div id="liveChatPanel">
 			<div id="liveChatPanelOutput">
 			</div>
