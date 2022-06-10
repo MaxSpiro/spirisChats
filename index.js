@@ -58,10 +58,6 @@ socket.on('sendMessage', function(data){
 
   socket.on('createUser',async function(data){
       try{
-        if(!sessionUsername){
-          socket.emit('notLoggedIn');
-          return;
-        }
         const usersWithSameName = await conn.query("SELECT * FROM users WHERE username = ?",[data["username"]]);
         if(usersWithSameName.length == 0){
           const result = await conn.query("INSERT INTO `users`(`username`, `password`) VALUES (?,?)",[data["username"],data["password"]]);
