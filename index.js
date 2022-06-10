@@ -37,19 +37,16 @@ app.use(express.static('.'));
 
 io.on('connection', (socket) => {
 
-  socket.on('listAllUsers',function(){
-    (async () => {
+  socket.on('listAllUsers',async function(){
       try{
         const result = await conn.query("SELECT `username` FROM users");
         socket.emit('listAllUsers',result);
       } catch(err){
         throw err;
       }
-    })();
-  });
+    });
 
-  socket.on('createUser',function(data){
-    (async () => {
+  socket.on('createUser',async function(data){
       try{
         const usersWithSameName = await conn.query("SELECT * FROM users WHERE username = ?",[data["username"]]);
         if(usersWithSameName.length == 0){
@@ -62,11 +59,9 @@ io.on('connection', (socket) => {
       } catch(err){
         throw err;
       }
-    })();
-  });
+    });
 
-  socket.on('logIn',function(data){
-    (async () => {
+  socket.on('logIn',async function(data){
       try{
         const result = await conn.query("SELECT * FROM users WHERE username = ?",[data["username"]]);
         if(result.length == 0){
@@ -80,12 +75,10 @@ io.on('connection', (socket) => {
       } catch(err){
         throw err;
       }
-    })();
-  });
+    });
 
 
-  socket.on('checkMessagesFrom',function(data){
-    (async () => {
+  socket.on('checkMessagesFrom',async function(data){
       try{
         const fromUserIdResult = await conn.query("SELECT userId FROM users WHERE username = ?", [data["username"]]);
         if(fromUserIdResult.length == 0){
@@ -113,11 +106,9 @@ io.on('connection', (socket) => {
       } catch(err){
         throw err;
       }
-    })()
-  });
+    });
 
-  socket.on('checkMessagesTo',function(data){
-    (async () => {
+  socket.on('checkMessagesTo',async function(data){
       try{
         const toUserIdResult = await conn.query("SELECT userId FROM users WHERE username = ?",[data["username"]]);
         if(toUserIdResult.length == 0){
@@ -144,13 +135,11 @@ io.on('connection', (socket) => {
       } catch(err){
         throw err;
       }
-    })();
   });
 
 
 
-  socket.on('createMessage',function(data){
-    (async () => {
+  socket.on('createMessage',async function(data){
       try{
         // First, VERIFY ALL USERS IN "TO" and change toArray from usernames to userIDs
         let toArray = data["to"].split(", ");
@@ -183,7 +172,6 @@ io.on('connection', (socket) => {
       } catch(err){
         throw err;
       }
-    })();
   });
 
 });
@@ -196,8 +184,4 @@ let port = process.env.PORT;
 if (port == null || port == "") {
   port = 8000;
 }
-server.listen(port);
-
-// server.listen(3000, () => {
-//   console.log('listening on *:3000');
-// });
+server.listen(3000);
